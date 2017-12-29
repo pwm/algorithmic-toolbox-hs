@@ -1,3 +1,1 @@
-# Algorithmic toolbox in JS
-
-Going back to the basics for fun.
+# Coursera's Algorithmic Toolbox in Haskell
