@@ -6,20 +6,16 @@ import Data.List     ((\\), sortBy, unfoldr)
 
 -- Core code
 
--- [23,39,92]
+largest :: [Int] -> Int
+largest xs = intListToInt $ sortBy bestPick xs where
+    bestPick x y
+        | pickFrom x y == x = LT
+        | pickFrom x y == y = GT
+        | otherwise         = EQ
+    pickFrom x y = digitsToInt $ cmpByDigits (intToDigits x) (intToDigits y)
 
-a :: [Int] -> [Int]
-a xs = sortBy g xs where
-    g x y
-        | f x y == x = LT
-        | f x y == y = GT
-        | otherwise  = EQ
-
-f :: Int -> Int -> Int
-f x y = digitsToInt $ pick (intToDigits x) (intToDigits y)
-
-pick :: [Int] -> [Int] -> [Int]
-pick xs ys
+cmpByDigits :: [Int] -> [Int] -> [Int]
+cmpByDigits xs ys
     | length xs > length ys = pickByDigits xs ys
     | length xs < length ys = pickByDigits ys xs
     | otherwise             = if digitsToInt xs >= digitsToInt ys then xs else ys
@@ -27,7 +23,7 @@ pick xs ys
         digitDiff as bs = filter (/= 0) $ zipWith (-) as bs
         pickByDigits lng srt
             | digitDiff lng srt /= [] = if (head $ digitDiff lng srt) > 0 then lng else srt
-            | otherwise               = if pick (lng \\ srt) srt == srt then srt else lng
+            | otherwise               = if cmpByDigits (lng \\ srt) srt == srt then srt else lng
 
 intToDigits :: Int -> [Int]
 intToDigits n = reverse $ unfoldr f (0, n) where
@@ -39,15 +35,18 @@ intToDigits n = reverse $ unfoldr f (0, n) where
 digitsToInt :: [Int] -> Int
 digitsToInt = foldl (\num d -> 10 * num + d) 0
 
+intListToInt :: [Int] -> Int
+intListToInt = digitsToInt . concat . map intToDigits
+
 -- IO plumbing
 
 main :: IO ()
 main = do
     xs <- parse <$> getContents
-    display xs
+    display $ largest xs
 
 parse :: String -> [Int]
 parse = map (read::String->Int) . concat . map words . tail . lines
 
-display :: [Int] -> IO ()
+display :: Int -> IO ()
 display = print
