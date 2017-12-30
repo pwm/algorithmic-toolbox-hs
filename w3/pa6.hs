@@ -6,8 +6,8 @@ import Data.List     ((\\), sortBy, unfoldr)
 
 -- Core code
 
-largest :: [Int] -> Int
-largest xs = intListToInt $ sortBy bestPick xs where
+largest :: [Int] -> [Int]
+largest xs = sortBy bestPick xs where
     bestPick x y
         | pickFrom x y == x = LT
         | pickFrom x y == y = GT
@@ -35,9 +35,6 @@ intToDigits n = reverse $ unfoldr f (0, n) where
 digitsToInt :: [Int] -> Int
 digitsToInt = foldl (\num d -> 10 * num + d) 0
 
-intListToInt :: [Int] -> Int
-intListToInt = digitsToInt . concat . map intToDigits
-
 -- IO plumbing
 
 main :: IO ()
@@ -48,5 +45,5 @@ main = do
 parse :: String -> [Int]
 parse = map (read::String->Int) . concat . map words . tail . lines
 
-display :: Int -> IO ()
-display = print
+display :: [Int] -> IO ()
+display = print . (read::String->Integer) . concatMap show
